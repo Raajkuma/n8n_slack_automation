@@ -1,0 +1,177 @@
+{
+  "name": "receipe Bot",
+  "nodes": [
+    {
+      "parameters": {
+        "trigger": [
+          "app_mention"
+        ],
+        "watchWorkspace": true,
+        "options": {
+          "resolveIds": false
+        }
+      },
+      "type": "n8n-nodes-base.slackTrigger",
+      "typeVersion": 1,
+      "position": [
+        352,
+        96
+      ],
+      "id": "6f14a0e5-cadc-4ca3-afbd-ab4118f293d6",
+      "name": "Slack Trigger",
+      "webhookId": "5b8a7c88-021d-48de-849e-25e5c902f1cf",
+      "credentials": {
+        "slackApi": {
+          "id": "EotdgTYVH3QkN0LC",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0CAXFJG941",
+          "mode": "id"
+        },
+        "text": "={{ $json.text}}",
+        "otherOptions": {
+          "includeLinkToWorkflow": false
+        }
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        1168,
+        96
+      ],
+      "id": "be9b456a-e059-4910-b21d-248c77def32d",
+      "name": "Send a message",
+      "webhookId": "4397103e-85ce-4f1b-864c-55d309772445",
+      "alwaysOutputData": false,
+      "credentials": {
+        "slackApi": {
+          "id": "EotdgTYVH3QkN0LC",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "docker.io/ai/qwen2.5:0.5B-F16",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        848,
+        256
+      ],
+      "id": "d5d3267c-eb16-4428-9006-c77962fd77db",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "nOWUVdTKuenO2QS3",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=user wants to know how to cook the item  {{ $json.query }}\nuser below context to generate importent ingredients and simple understandable cooking proceedure \nContents:{{ $json.results }}",
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        784,
+        96
+      ],
+      "id": "a062e320-b3c8-41fb-8eaa-ea7ecd40064f",
+      "name": "Basic LLM Chain"
+    },
+    {
+      "parameters": {
+        "query": "={{ $json.text }}",
+        "options": {}
+      },
+      "type": "@tavily/n8n-nodes-tavily.tavily",
+      "typeVersion": 2.1,
+      "position": [
+        560,
+        96
+      ],
+      "id": "f3890a56-1e19-4bac-a7ca-572422ea0893",
+      "name": "Search the web",
+      "credentials": {
+        "tavilyApi": {
+          "id": "i3aKxYK7MIr8vM5S",
+          "name": "Tavily account 5"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Slack Trigger": {
+      "main": [
+        [
+          {
+            "node": "Search the web",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Basic LLM Chain": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search the web": {
+      "main": [
+        [
+          {
+            "node": "Basic LLM Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "659911cf-765c-4527-a2dc-e358830576a3",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6bf3883745d5651b7d2065e997eedea7ff7e87b443d4aa6495bc92c38c0d60cd"
+  },
+  "nodeGroups": [],
+  "id": "69wjyirVmlDwIs6k",
+  "tags": []
+}
